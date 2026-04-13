@@ -1,5 +1,8 @@
 # 🪵 Plywood Business Sales Intelligence Dashboard
 
+## 🚀 Live Demo
+👉 https://your-project.streamlit.app
+
 A complete business management + analytics dashboard built for a plywood & wood products business.
 
 ## Features
