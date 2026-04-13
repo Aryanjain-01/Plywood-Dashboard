@@ -1,0 +1,218 @@
+[
+  {
+    "id": "P001",
+    "name": "Plywood 8x4 ft (4mm)",
+    "category": "Plywood",
+    "size": "8x4 ft",
+    "thickness": "4mm",
+    "unit": "sheet",
+    "base_price": 650
+  },
+  {
+    "id": "P002",
+    "name": "Plywood 8x4 ft (6mm)",
+    "category": "Plywood",
+    "size": "8x4 ft",
+    "thickness": "6mm",
+    "unit": "sheet",
+    "base_price": 800
+  },
+  {
+    "id": "P003",
+    "name": "Plywood 8x4 ft (9mm)",
+    "category": "Plywood",
+    "size": "8x4 ft",
+    "thickness": "9mm",
+    "unit": "sheet",
+    "base_price": 1050
+  },
+  {
+    "id": "P004",
+    "name": "Plywood 8x4 ft (12mm)",
+    "category": "Plywood",
+    "size": "8x4 ft",
+    "thickness": "12mm",
+    "unit": "sheet",
+    "base_price": 1300
+  },
+  {
+    "id": "P005",
+    "name": "Plywood 8x4 ft (18mm)",
+    "category": "Plywood",
+    "size": "8x4 ft",
+    "thickness": "18mm",
+    "unit": "sheet",
+    "base_price": 1700
+  },
+  {
+    "id": "P006",
+    "name": "Plywood 8x4 ft (25mm)",
+    "category": "Plywood",
+    "size": "8x4 ft",
+    "thickness": "25mm",
+    "unit": "sheet",
+    "base_price": 2200
+  },
+  {
+    "id": "D001",
+    "name": "Flush Door 7x3 ft",
+    "category": "Doors",
+    "size": "7x3 ft",
+    "thickness": "35mm",
+    "unit": "piece",
+    "base_price": 3500
+  },
+  {
+    "id": "D002",
+    "name": "Flush Door 7x3.5 ft",
+    "category": "Doors",
+    "size": "7x3.5 ft",
+    "thickness": "35mm",
+    "unit": "piece",
+    "base_price": 4000
+  },
+  {
+    "id": "D003",
+    "name": "Panel Door Teak",
+    "category": "Doors",
+    "size": "7x3 ft",
+    "thickness": "40mm",
+    "unit": "piece",
+    "base_price": 7500
+  },
+  {
+    "id": "D004",
+    "name": "Panel Door Sal",
+    "category": "Doors",
+    "size": "7x3 ft",
+    "thickness": "40mm",
+    "unit": "piece",
+    "base_price": 5500
+  },
+  {
+    "id": "L001",
+    "name": "Cen Mica (Plain)",
+    "category": "Cen Mica",
+    "size": "8x4 ft",
+    "thickness": "1mm",
+    "unit": "sheet",
+    "base_price": 900
+  },
+  {
+    "id": "L002",
+    "name": "Cen Mica (Woodgrain)",
+    "category": "Cen Mica",
+    "size": "8x4 ft",
+    "thickness": "1mm",
+    "unit": "sheet",
+    "base_price": 1100
+  },
+  {
+    "id": "L003",
+    "name": "Cen Mica (Matte)",
+    "category": "Cen Mica",
+    "size": "8x4 ft",
+    "thickness": "1mm",
+    "unit": "sheet",
+    "base_price": 1050
+  },
+  {
+    "id": "L004",
+    "name": "Sunmica Plain",
+    "category": "Cen Mica",
+    "size": "8x4 ft",
+    "thickness": "1mm",
+    "unit": "sheet",
+    "base_price": 850
+  },
+  {
+    "id": "V001",
+    "name": "Teak Veneer",
+    "category": "Veneer",
+    "size": "8x4 ft",
+    "thickness": "0.5mm",
+    "unit": "sheet",
+    "base_price": 1800
+  },
+  {
+    "id": "V002",
+    "name": "Rosewood Veneer",
+    "category": "Veneer",
+    "size": "8x4 ft",
+    "thickness": "0.5mm",
+    "unit": "sheet",
+    "base_price": 2200
+  },
+  {
+    "id": "V003",
+    "name": "Wenge Veneer",
+    "category": "Veneer",
+    "size": "8x4 ft",
+    "thickness": "0.5mm",
+    "unit": "sheet",
+    "base_price": 2400
+  },
+  {
+    "id": "V004",
+    "name": "Maple Veneer",
+    "category": "Veneer",
+    "size": "8x4 ft",
+    "thickness": "0.5mm",
+    "unit": "sheet",
+    "base_price": 2000
+  },
+  {
+    "id": "DC001",
+    "name": "Wooden Moulding (per mtr)",
+    "category": "Decoratives",
+    "size": "per mtr",
+    "thickness": "-",
+    "unit": "mtr",
+    "base_price": 120
+  },
+  {
+    "id": "DC002",
+    "name": "Beading Strip",
+    "category": "Decoratives",
+    "size": "per mtr",
+    "thickness": "-",
+    "unit": "mtr",
+    "base_price": 80
+  },
+  {
+    "id": "DC003",
+    "name": "Edge Band Tape",
+    "category": "Decoratives",
+    "size": "per mtr",
+    "thickness": "-",
+    "unit": "mtr",
+    "base_price": 15
+  },
+  {
+    "id": "DC004",
+    "name": "PVC Foam Sheet",
+    "category": "Decoratives",
+    "size": "8x4 ft",
+    "thickness": "5mm",
+    "unit": "sheet",
+    "base_price": 550
+  },
+  {
+    "id": "H001",
+    "name": "Piano Hinge (per ft)",
+    "category": "Hardware",
+    "size": "per ft",
+    "thickness": "-",
+    "unit": "ft",
+    "base_price": 35
+  },
+  {
+    "id": "H002",
+    "name": "Wooden Dowel (per pkt)",
+    "category": "Hardware",
+    "size": "standard",
+    "thickness": "-",
+    "unit": "packet",
+    "base_price": 85
+  }
+]
