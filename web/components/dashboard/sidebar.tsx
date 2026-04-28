@@ -16,25 +16,25 @@ const items: { key: Page; label: string; icon: React.ComponentType<{ className?:
 
 export function Sidebar({ page, setPage }: { page: Page; setPage: (p: Page) => void }) {
   return (
-    <aside className="fixed left-0 top-0 z-30 flex h-screen w-60 flex-col border-r border-sidebar-border bg-sidebar">
+    <aside className="fixed left-0 top-0 z-30 flex h-screen w-60 flex-col border-r border-white/[0.06] bg-[oklch(0.10_0.012_265)]">
       {/* Logo */}
       <div className="px-5 pt-6 pb-5">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/15 text-base">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-500/20 text-sm leading-none">
             🪵
           </div>
           <div>
-            <p className="text-sm font-semibold tracking-tight text-foreground">PlywoodPro</p>
-            <p className="text-2xs uppercase tracking-widest text-muted-foreground">Dashboard</p>
+            <p className="text-sm font-semibold tracking-tight text-white/90">PlywoodPro</p>
+            <p style={{ fontSize: "10px" }} className="uppercase tracking-widest text-white/30">Dashboard</p>
           </div>
         </div>
       </div>
 
-      <div className="mx-4 h-px bg-border" />
+      <div className="mx-4 h-px bg-white/[0.06]" />
 
       {/* Nav */}
       <nav className="flex-1 space-y-0.5 px-3 py-4">
-        <p className="mb-2 px-2 text-2xs font-medium uppercase tracking-widest text-muted-foreground/60">
+        <p style={{ fontSize: "10px" }} className="mb-2 px-2 font-medium uppercase tracking-widest text-white/25">
           Menu
         </p>
         {items.map((item) => {
@@ -45,13 +45,13 @@ export function Sidebar({ page, setPage }: { page: Page; setPage: (p: Page) => v
               key={item.key}
               onClick={() => setPage(item.key)}
               className={cn(
-                "flex h-9 w-full items-center gap-3 rounded-lg px-3 text-sm font-medium transition-all duration-150",
+                "flex h-9 w-full items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors duration-100",
                 active
-                  ? "bg-primary/12 text-foreground"
-                  : "text-muted-foreground hover:bg-border/60 hover:text-foreground"
+                  ? "bg-indigo-500/[0.12] text-white"
+                  : "text-white/40 hover:bg-white/[0.05] hover:text-white/70"
               )}
             >
-              <Icon className={cn("h-4 w-4 shrink-0", active ? "text-primary" : "text-muted-foreground")} />
+              <Icon className={cn("h-4 w-4 shrink-0", active ? "text-indigo-400" : "text-white/30")} />
               {item.label}
             </button>
           )
@@ -59,15 +59,15 @@ export function Sidebar({ page, setPage }: { page: Page; setPage: (p: Page) => v
       </nav>
 
       {/* User */}
-      <div className="mx-4 mb-5 mt-auto">
-        <div className="mx-px h-px bg-border mb-4" />
+      <div className="px-4 pb-5">
+        <div className="h-px bg-white/[0.06] mb-4" />
         <div className="flex items-center gap-3 rounded-lg px-3 py-2.5">
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/20 text-xs font-semibold text-primary">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-500/25 text-xs font-semibold text-indigo-300">
             AJ
           </div>
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-foreground">Aryan Jain</p>
-            <p className="truncate text-xs text-muted-foreground">Business Admin</p>
+            <p className="truncate text-sm font-medium text-white/80">Aryan Jain</p>
+            <p className="truncate text-xs text-white/35">Business Admin</p>
           </div>
         </div>
       </div>

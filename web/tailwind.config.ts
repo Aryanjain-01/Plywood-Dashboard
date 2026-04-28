@@ -10,70 +10,59 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        border: "var(--border)",
-        input: "var(--input)",
-        ring: "var(--ring)",
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        background: "#0d1117",
+        foreground: "#e2e8f0",
+        border: "rgba(255,255,255,0.07)",
+        input: "rgba(255,255,255,0.06)",
+        ring: "rgba(129,140,248,0.5)",
         primary: {
-          DEFAULT: "var(--primary)",
-          foreground: "var(--primary-foreground)"
+          DEFAULT: "#818cf8",
+          foreground: "#ffffff"
         },
         secondary: {
-          DEFAULT: "var(--secondary)",
-          foreground: "var(--secondary-foreground)"
+          DEFAULT: "#1e2530",
+          foreground: "#cbd5e1"
         },
         muted: {
-          DEFAULT: "var(--muted)",
-          foreground: "var(--muted-foreground)"
+          DEFAULT: "#1e2530",
+          foreground: "#64748b"
         },
         accent: {
-          DEFAULT: "var(--accent)",
-          foreground: "var(--accent-foreground)"
+          DEFAULT: "#818cf8",
+          foreground: "#ffffff"
         },
         destructive: {
-          DEFAULT: "var(--destructive)"
+          DEFAULT: "#f87171"
         },
         card: {
-          DEFAULT: "var(--card)",
-          foreground: "var(--card-foreground)"
+          DEFAULT: "#161b22",
+          foreground: "#e2e8f0"
         },
         popover: {
-          DEFAULT: "var(--popover)",
-          foreground: "var(--popover-foreground)"
+          DEFAULT: "#161b22",
+          foreground: "#e2e8f0"
         },
         sidebar: {
-          DEFAULT: "var(--sidebar)",
-          foreground: "var(--sidebar-foreground)",
-          border: "var(--sidebar-border)"
+          DEFAULT: "#0f1318",
+          foreground: "#e2e8f0",
+          border: "rgba(255,255,255,0.06)"
         }
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-        xl: "calc(var(--radius) + 4px)",
-        "2xl": "calc(var(--radius) + 8px)"
-      },
-      fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"]
-      },
-      fontSize: {
-        "2xs": ["0.65rem", { lineHeight: "1rem" }]
-      },
-      boxShadow: {
-        card: "0 1px 3px rgba(0,0,0,0.4), 0 0 0 1px oklch(1 0 0 / 6%)",
-        "card-hover": "0 4px 16px rgba(0,0,0,0.5), 0 0 0 1px oklch(1 0 0 / 10%)",
-        glow: "0 0 24px oklch(0.60 0.18 264 / 20%)"
+        lg: "0.75rem",
+        md: "0.625rem",
+        sm: "0.5rem",
+        xl: "1rem",
+        "2xl": "1.25rem"
       },
       keyframes: {
         "fade-in": {
-          from: { opacity: "0", transform: "translateY(6px)" },
+          from: { opacity: "0", transform: "translateY(8px)" },
           to: { opacity: "1", transform: "translateY(0)" }
         }
       },
       animation: {
-        "fade-in": "fade-in 0.2s ease-out"
+        "fade-in": "fade-in 0.25s ease-out"
       }
     }
   },
