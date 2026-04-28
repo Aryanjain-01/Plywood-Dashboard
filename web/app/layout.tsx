@@ -3,7 +3,7 @@ import "./globals.css"
 import { TooltipProvider } from "@/components/ui/tooltip"
 
 export const metadata: Metadata = {
-  title: "PlywoodPro Dashboard",
+  title: "PlywoodPro",
   description: "Business intelligence dashboard"
 }
 

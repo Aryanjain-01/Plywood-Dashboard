@@ -16,38 +16,59 @@ const items: { key: Page; label: string; icon: React.ComponentType<{ className?:
 
 export function Sidebar({ page, setPage }: { page: Page; setPage: (p: Page) => void }) {
   return (
-    <aside className="fixed left-0 top-0 z-30 h-screen w-64 border-r border-white/10 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
-      <div className="flex h-full flex-col p-4">
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-          <div className="text-3xl">🪵</div>
-          <p className="mt-2 text-4xl font-semibold tracking-tight text-slate-100">PlywoodPro</p>
-          <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Business Intelligence</p>
+    <aside className="fixed left-0 top-0 z-30 flex h-screen w-60 flex-col border-r border-sidebar-border bg-sidebar">
+      {/* Logo */}
+      <div className="px-5 pt-6 pb-5">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/15 text-base">
+            🪵
+          </div>
+          <div>
+            <p className="text-sm font-semibold tracking-tight text-foreground">PlywoodPro</p>
+            <p className="text-2xs uppercase tracking-widest text-muted-foreground">Dashboard</p>
+          </div>
         </div>
+      </div>
 
-        <nav className="mt-5 space-y-2">
-          {items.map((item) => {
-            const Icon = item.icon
-            const active = page === item.key
-            return (
-              <button
-                key={item.key}
-                onClick={() => setPage(item.key)}
-                className={cn(
-                  "relative flex h-11 w-full items-center gap-3 rounded-xl px-4 text-sm font-medium text-gray-300 transition-all duration-300 ease-in-out hover:translate-x-1 hover:bg-white/5 hover:shadow-[0_0_20px_rgba(59,130,246,0.1)]",
-                  active && "bg-gradient-to-r from-blue-500/20 to-transparent text-white shadow-[0_0_20px_rgba(59,130,246,0.2)]"
-                )}
-              >
-                {active && <span className="absolute left-1 h-6 w-0.5 rounded-full bg-blue-400" />}
-                <Icon className={cn("h-5 w-5 text-gray-400", active && "text-blue-400")} />
-                <span className="whitespace-nowrap">{item.label}</span>
-              </button>
-            )
-          })}
-        </nav>
+      <div className="mx-4 h-px bg-border" />
 
-        <div className="mt-auto rounded-xl border border-white/10 bg-white/[0.03] p-3">
-          <p className="text-sm font-medium text-slate-100">Aryan Jain</p>
-          <p className="text-xs text-slate-400">Business Admin</p>
+      {/* Nav */}
+      <nav className="flex-1 space-y-0.5 px-3 py-4">
+        <p className="mb-2 px-2 text-2xs font-medium uppercase tracking-widest text-muted-foreground/60">
+          Menu
+        </p>
+        {items.map((item) => {
+          const Icon = item.icon
+          const active = page === item.key
+          return (
+            <button
+              key={item.key}
+              onClick={() => setPage(item.key)}
+              className={cn(
+                "flex h-9 w-full items-center gap-3 rounded-lg px-3 text-sm font-medium transition-all duration-150",
+                active
+                  ? "bg-primary/12 text-foreground"
+                  : "text-muted-foreground hover:bg-border/60 hover:text-foreground"
+              )}
+            >
+              <Icon className={cn("h-4 w-4 shrink-0", active ? "text-primary" : "text-muted-foreground")} />
+              {item.label}
+            </button>
+          )
+        })}
+      </nav>
+
+      {/* User */}
+      <div className="mx-4 mb-5 mt-auto">
+        <div className="mx-px h-px bg-border mb-4" />
+        <div className="flex items-center gap-3 rounded-lg px-3 py-2.5">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/20 text-xs font-semibold text-primary">
+            AJ
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium text-foreground">Aryan Jain</p>
+            <p className="truncate text-xs text-muted-foreground">Business Admin</p>
+          </div>
         </div>
       </div>
     </aside>
