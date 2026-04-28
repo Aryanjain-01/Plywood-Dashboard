@@ -18,6 +18,9 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import plotly.express as px
 import plotly.graph_objects as go
+from bokeh.plotting import figure
+from bokeh.models import ColumnDataSource, HoverTool, NumeralTickFormatter
+from bokeh.transform import dodge
 import os
 import json
 from datetime import datetime, date
@@ -35,135 +38,359 @@ st.set_page_config(
 )
 
 # ─────────────────────────────────────────────
-# 2. CUSTOM CSS — warm wood-toned industrial UI
+# 2. PREMIUM SAAS GLASS THEME (dark + minimal)
 # ─────────────────────────────────────────────
 st.markdown("""
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  :root {
+    --bg: #070d18;
+    --surface: rgba(15, 23, 42, 0.55);
+    --surface-2: rgba(30, 41, 59, 0.45);
+    --text: #f2f7ff;
+    --muted: #c8d4e7;
+    --border: rgba(148, 163, 184, 0.22);
+    --accent: #3b82f6;
+    --accent-soft: rgba(59, 130, 246, 0.26);
+    --grid: rgba(148, 163, 184, 0.2);
+    --transition: all 0.25s ease;
+  }
 
   html, body, [class*="css"] {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
   }
 
-  /* Background */
   .stApp {
-    background: #1a1208;
-    color: #f0e6d3;
+    background:
+      radial-gradient(1200px 520px at 14% -10%, rgba(59,130,246,0.22), transparent),
+      radial-gradient(900px 430px at 94% 0%, rgba(99,102,241,0.16), transparent),
+      linear-gradient(165deg, #0b1322 0%, #111d3b 52%, #0b2138 100%) !important;
+    color: var(--text) !important;
   }
 
-  /* Sidebar */
   section[data-testid="stSidebar"] {
-    background: #120d05 !important;
-    border-right: 1px solid #3d2e1a;
+    background: linear-gradient(180deg, #020617 0%, #0b1326 45%, #020617 100%) !important;
+    backdrop-filter: blur(12px) saturate(120%);
+    border-right: 1px solid rgba(255,255,255,0.08) !important;
+    width: 17rem !important;
+    min-width: 17rem !important;
+    max-width: 17rem !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 14px 0 30px -22px rgba(0,0,0,0.9) !important;
   }
-  section[data-testid="stSidebar"] * { color: #d4c4a8 !important; }
-  section[data-testid="stSidebar"] .stSelectbox label,
-  section[data-testid="stSidebar"] .stRadio label { color: #a89070 !important; }
-
-  /* Metric cards */
-  div[data-testid="metric-container"] {
-    background: linear-gradient(135deg, #2a1f0e 0%, #1e1608 100%);
-    border: 1px solid #5c3d1e;
-    border-radius: 12px;
-    padding: 16px 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  section[data-testid="stSidebar"] > div { width: 17rem !important; min-width: 17rem !important; max-width: 17rem !important; }
+  section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0.2rem 0.55rem 0.8rem 0.55rem;
   }
-  div[data-testid="metric-container"] label { color: #a89070 !important; font-size: 0.78rem; letter-spacing: 1px; text-transform: uppercase; }
-  div[data-testid="metric-container"] [data-testid="stMetricValue"] { color: #f5d78e !important; font-size: 1.8rem; font-weight: 600; }
-  div[data-testid="metric-container"] [data-testid="stMetricDelta"] { color: #72c472 !important; }
+  section[data-testid="stSidebar"] * { color: #e7f0ff !important; transition: var(--transition); }
+  section[data-testid="stSidebar"] div[role="radiogroup"] {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin-top: 0.35rem;
+  }
+  section[data-testid="stSidebar"] div[role="radiogroup"] label {
+    border-radius: 0.85rem !important;
+    padding: 0 0.9rem !important;
+    min-height: 2.75rem;
+    height: 2.75rem;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    transition: all 300ms ease-in-out !important;
+    border: 1px solid transparent !important;
+    position: relative;
+    overflow: visible !important;
+    width: 100% !important;
+    max-width: none !important;
+    gap: 0.65rem !important;
+    background: rgba(15, 23, 42, 0.25) !important;
+  }
+  /* hide Streamlit's default radio indicator */
+  section[data-testid="stSidebar"] div[role="radiogroup"] label > input[type="radio"] {
+    position: absolute !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  section[data-testid="stSidebar"] div[role="radiogroup"] label > input[type="radio"] + div {
+    display: none !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+  section[data-testid="stSidebar"] div[role="radiogroup"] label > div,
+  section[data-testid="stSidebar"] div[role="radiogroup"] label div[role="presentation"],
+  section[data-testid="stSidebar"] div[role="radiogroup"] label [data-testid="stMarkdownContainer"] {
+    width: 100% !important;
+    max-width: none !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 0.65rem;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    min-width: 0;
+    flex-wrap: nowrap !important;
+  }
+  section[data-testid="stSidebar"] div[role="radiogroup"] label [data-testid="stMarkdownContainer"] {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+  section[data-testid="stSidebar"] div[role="radiogroup"] label p,
+  section[data-testid="stSidebar"] div[role="radiogroup"] label span {
+    margin: 0 !important;
+    line-height: 1 !important;
+    letter-spacing: 0.01em;
+    white-space: nowrap !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+    writing-mode: horizontal-tb !important;
+    text-orientation: mixed !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    font-size: 0.875rem !important; /* text-sm */
+    font-weight: 550 !important;
+    color: #d1d5db !important;
+    max-width: none !important;
+    min-width: auto !important;
+    display: inline !important;
+    background: transparent !important;
+  }
+  /* custom mini arrow icon */
+  section[data-testid="stSidebar"] div[role="radiogroup"] label::before {
+    width: 0.9rem;
+    height: 0.9rem;
+    min-width: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-size: 0.72rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  section[data-testid="stSidebar"] div[role="radiogroup"] label:nth-child(1)::before { content: "▸"; }
+  section[data-testid="stSidebar"] div[role="radiogroup"] label:nth-child(2)::before { content: "▸"; }
+  section[data-testid="stSidebar"] div[role="radiogroup"] label:nth-child(3)::before { content: "▸"; }
+  section[data-testid="stSidebar"] div[role="radiogroup"] label:nth-child(4)::before { content: "▸"; }
+  section[data-testid="stSidebar"] div[role="radiogroup"] label:nth-child(5)::before { content: "▸"; }
+  section[data-testid="stSidebar"] div[role="radiogroup"] label:hover {
+    background: rgba(59, 130, 246, 0.12) !important;
+    border-color: rgba(96, 165, 250, 0.28) !important;
+    box-shadow: 0 0 18px rgba(59,130,246,0.12) !important;
+    transform: translateX(3px);
+  }
+  section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
+    background: linear-gradient(90deg, rgba(59,130,246,0.24) 0%, rgba(59,130,246,0.1) 58%, rgba(59,130,246,0.00) 100%) !important;
+    border: 1px solid rgba(96,165,250,0.36) !important;
+    box-shadow: 0 0 0 1px rgba(59,130,246,0.14), 0 0 22px rgba(59,130,246,0.24), 0 14px 24px -18px rgba(59,130,246,0.55) !important;
+    transform: translateX(3px);
+  }
+  section[data-testid="stSidebar"] div[role="radiogroup"] label[aria-checked="true"] {
+    background: linear-gradient(90deg, rgba(59,130,246,0.24) 0%, rgba(59,130,246,0.1) 58%, rgba(59,130,246,0.00) 100%) !important;
+    border: 1px solid rgba(96,165,250,0.36) !important;
+    box-shadow: 0 0 0 1px rgba(59,130,246,0.14), 0 0 22px rgba(59,130,246,0.24), 0 14px 24px -18px rgba(59,130,246,0.55) !important;
+    transform: translateX(3px);
+  }
+  section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked)::after,
+  section[data-testid="stSidebar"] div[role="radiogroup"] label[aria-checked="true"]::after {
+    content: "";
+    position: absolute;
+    left: 0.18rem;
+    top: 0.42rem;
+    bottom: 0.42rem;
+    width: 2px;
+    border-radius: 999px;
+    background: #60a5fa;
+    box-shadow: 0 0 10px rgba(96,165,250,0.7);
+  }
+  section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) p,
+  section[data-testid="stSidebar"] div[role="radiogroup"] label[aria-checked="true"] p {
+    color: #f8fbff !important;
+  }
+  section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked)::before,
+  section[data-testid="stSidebar"] div[role="radiogroup"] label[aria-checked="true"]::before {
+    color: #60a5fa !important; /* text-blue-400 */
+  }
 
-  /* Section headers */
+  .hero-banner {
+    background: linear-gradient(140deg, rgba(15, 23, 42, 0.78) 0%, rgba(30, 64, 175, 0.36) 55%, rgba(8, 145, 178, 0.26) 100%) !important;
+    border: 1px solid var(--border) !important;
+    backdrop-filter: blur(16px) saturate(130%);
+    box-shadow: 0 0 0 1px rgba(59,130,246,0.18), 0 20px 48px -28px rgba(59,130,246,0.5) !important;
+    border-radius: 20px !important;
+    padding: 24px 28px !important;
+    transition: var(--transition);
+  }
+  .hero-banner:hover { box-shadow: 0 0 0 1px rgba(59,130,246,0.28), 0 26px 56px -26px rgba(59,130,246,0.58) !important; }
+  .hero-title { color: #eaf1ff !important; }
+  .hero-sub { color: #d0def3 !important; font-size: 0.98rem !important; }
+
   .section-header {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.4rem;
-    color: #f5d78e;
-    border-bottom: 2px solid #5c3d1e;
-    padding-bottom: 8px;
-    margin: 24px 0 16px 0;
-    letter-spacing: 0.5px;
+    color: #eef4ff !important;
+    border-bottom: 1px solid rgba(148,163,184,0.2) !important;
+    margin: 20px 0 12px 0 !important;
+    padding-bottom: 6px !important;
+    font-size: 1.02rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.01em !important;
   }
 
-  /* Card wrapper */
   .card {
-    background: #231a0c;
-    border: 1px solid #3d2e1a;
-    border-radius: 14px;
-    padding: 20px;
-    margin-bottom: 16px;
+    background: rgba(15, 23, 42, 0.66) !important;
+    border: 1px solid var(--border) !important;
+    backdrop-filter: blur(14px) saturate(120%);
+    box-shadow: 0 8px 28px -18px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255,255,255,0.05);
+    border-radius: 16px !important;
+    padding: 14px 16px !important;
+    transition: var(--transition);
+  }
+  .card:hover { border-color: rgba(59,130,246,0.35) !important; box-shadow: 0 0 0 1px rgba(59,130,246,0.2), 0 14px 34px -20px rgba(59,130,246,0.55); }
+
+  /* Glass panels for bordered containers / forms */
+  div[data-testid="stVerticalBlockBorderWrapper"],
+  div[data-testid="stForm"] {
+    background: rgba(15, 23, 42, 0.58) !important; /* stronger for readability */
+    border: 1px solid rgba(255, 255, 255, 0.1) !important; /* border-white/10 */
+    border-radius: 1rem !important; /* rounded-2xl */
+    backdrop-filter: blur(20px) saturate(135%); /* backdrop-blur-xl */
+    -webkit-backdrop-filter: blur(20px) saturate(135%);
+    box-shadow: 0 0 40px rgba(59,130,246,0.1), 0 10px 30px -20px rgba(0,0,0,0.8) !important;
+    transition: var(--transition);
+  }
+  div[data-testid="stVerticalBlockBorderWrapper"]:hover,
+  div[data-testid="stForm"]:hover {
+    border-color: rgba(59,130,246,0.3) !important;
+    box-shadow: 0 0 40px rgba(59,130,246,0.14), 0 14px 34px -20px rgba(59,130,246,0.42) !important;
   }
 
-  /* Success/info boxes */
-  .stSuccess { background: #0d2e0d !important; border: 1px solid #2d6b2d !important; }
-  .stInfo    { background: #0d1e35 !important; border: 1px solid #1e4b8c !important; }
-  .stWarning { background: #2e1e0d !important; border: 1px solid #6b4a1e !important; }
+  div[data-testid="stVerticalBlockBorderWrapper"] > div {
+    padding: 0.75rem 0.85rem 0.85rem 0.85rem;
+  }
 
-  /* Buttons */
+  div[data-testid="metric-container"] {
+    background: linear-gradient(155deg, rgba(15,23,42,0.72) 0%, rgba(30,41,59,0.52) 100%) !important;
+    border: 1px solid var(--border) !important;
+    backdrop-filter: blur(14px) saturate(120%);
+    box-shadow: 0 10px 30px -18px rgba(59,130,246,0.42), inset 0 1px 0 rgba(255,255,255,0.06) !important;
+    border-radius: 14px !important;
+    padding: 14px 16px !important;
+    transition: var(--transition);
+  }
+  div[data-testid="metric-container"]:hover { border-color: rgba(59,130,246,0.4) !important; box-shadow: 0 0 0 1px rgba(59,130,246,0.18), 0 16px 36px -22px rgba(59,130,246,0.55) !important; }
+  div[data-testid="metric-container"] label { color: var(--muted) !important; }
+  div[data-testid="metric-container"] [data-testid="stMetricValue"] { color: #f3f8ff !important; font-size: 1.6rem !important; }
+  div[data-testid="metric-container"] [data-testid="stMetricDelta"] { color: #7dd3fc !important; }
+
   .stButton > button {
-    background: linear-gradient(135deg, #8B5E2A, #6B4010);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    padding: 10px 24px;
-    transition: all 0.2s;
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 58%, #0891b2 100%) !important;
+    color: #f8fbff !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(148,163,184,0.25) !important;
+    min-height: 2.35rem !important;
+    transition: var(--transition);
   }
   .stButton > button:hover {
-    background: linear-gradient(135deg, #a87040, #8B5E2A);
-    box-shadow: 0 4px 14px rgba(139,94,42,0.5);
+    background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 55%, #06b6d4 100%) !important;
+    box-shadow: 0 0 0 1px rgba(59,130,246,0.28), 0 14px 30px -18px rgba(59,130,246,0.75) !important;
     transform: translateY(-1px);
   }
 
-  /* Dataframe */
-  .stDataFrame { border: 1px solid #3d2e1a !important; border-radius: 10px; overflow: hidden; }
+  .stDataFrame {
+    border: 1px solid var(--border) !important;
+    border-radius: 12px !important;
+    background: rgba(15,23,42,0.68) !important;
+    backdrop-filter: blur(10px);
+  }
 
-  /* Inputs */
-  .stTextInput input, .stNumberInput input, .stSelectbox select,
-  .stDateInput input, .stTextArea textarea {
-    background: #2a1f0e !important;
-    border: 1px solid #5c3d1e !important;
-    color: #f0e6d3 !important;
+  .stTextInput input, .stNumberInput input, .stSelectbox select, .stDateInput input, .stTextArea textarea {
+    background: rgba(15,23,42,0.78) !important;
+    color: #f2f7ff !important;
+    border: 1px solid rgba(148,163,184,0.24) !important;
+    border-radius: 10px !important;
+    transition: var(--transition);
+  }
+  .stTextInput input:focus, .stNumberInput input:focus, .stSelectbox select:focus, .stDateInput input:focus, .stTextArea textarea:focus {
+    border-color: rgba(59,130,246,0.55) !important;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.14);
+  }
+
+  .stTabs [data-baseweb="tab-list"] {
+    background: rgba(15,23,42,0.5) !important;
+    border: 1px solid var(--border) !important;
+    backdrop-filter: blur(10px);
+    border-radius: 10px !important;
+    padding: 2px !important;
+  }
+  .stTabs [data-baseweb="tab"] {
+    color: #d4e0f2 !important;
     border-radius: 8px !important;
+    padding: 8px 12px !important;
+    transition: var(--transition);
+  }
+  .stTabs [aria-selected="true"] {
+    background: rgba(59,130,246,0.2) !important;
+    color: #e6f0ff !important;
+    box-shadow: inset 0 0 0 1px rgba(59,130,246,0.28);
   }
 
-  /* Tabs */
-  .stTabs [data-baseweb="tab-list"] { background: #1e1608; border-radius: 10px; padding: 4px; }
-  .stTabs [data-baseweb="tab"] { color: #a89070; border-radius: 8px; font-weight: 500; }
-  .stTabs [aria-selected="true"] { background: #5c3d1e !important; color: #f5d78e !important; }
-
-  /* Hide default Streamlit elements */
-  #MainMenu, footer, header { visibility: hidden; }
-
-  /* Logo area */
-  .logo-text {
-    font-family: 'DM Serif Display', serif;
-    font-size: 2rem;
-    color: #f5d78e;
-    line-height: 1;
-  }
-  .logo-sub {
-    font-size: 0.75rem;
-    color: #a89070;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-top: 2px;
+  .stInfo, .stSuccess, .stWarning {
+    background: rgba(15,23,42,0.72) !important;
+    border: 1px solid var(--border) !important;
+    backdrop-filter: blur(10px);
   }
 
-  /* Big title banner */
-  .hero-banner {
-    background: linear-gradient(135deg, #3d2200 0%, #1a1208 60%);
-    border: 1px solid #5c3d1e;
-    border-radius: 16px;
-    padding: 28px 36px;
-    margin-bottom: 24px;
+  .logo-text { font-size: 1.8rem; font-weight: 700; color: #e8f0ff; line-height: 1; letter-spacing: -0.01em; }
+  .logo-sub { font-size: 0.74rem; color: #c0cfe6; letter-spacing: 0.17em; text-transform: uppercase; margin-top: 3px; }
+  .sidebar-profile {
+    margin-top: auto;
+    background: linear-gradient(135deg, rgba(30,41,59,0.55) 0%, rgba(15,23,42,0.48) 100%);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 0 24px rgba(59,130,246,0.14);
   }
-  .hero-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 2.2rem;
-    color: #f5d78e;
-    margin: 0;
+  .profile-dot {
+    width: 34px;
+    height: 34px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 55%, #06b6d4 100%);
+    box-shadow: 0 0 14px rgba(59,130,246,0.45);
+    flex-shrink: 0;
   }
-  .hero-sub { color: #a89070; font-size: 0.9rem; margin-top: 6px; }
+  .profile-name { font-size: 0.87rem; font-weight: 600; color: #edf4ff; margin: 0; line-height: 1.2; white-space: nowrap; }
+  .profile-role { font-size: 0.73rem; color: #b8c9e3; margin: 1px 0 0 0; white-space: nowrap; }
+
+  p, li, label, span, div {
+    color: inherit;
+  }
+
+  .element-container { margin-bottom: 0.42rem !important; }
+  hr { border-color: rgba(148,163,184,0.2) !important; }
+
+  #MainMenu, footer { visibility: hidden; }
+
+  @media (max-width: 768px) {
+    .hero-banner { padding: 18px 16px !important; border-radius: 14px !important; }
+    .hero-title { font-size: 1.6rem !important; }
+    .hero-sub { font-size: 0.86rem !important; }
+    .section-header { margin-top: 16px !important; }
+  }
 </style>
 """, unsafe_allow_html=True)
 
@@ -325,9 +552,9 @@ def get_products_df(products_list):
 # ─────────────────────────────────────────────
 # 5. CHART HELPERS  (Matplotlib + Plotly)
 # ─────────────────────────────────────────────
-CHART_BG   = "#1e1608"
-CHART_TEXT = "#d4c4a8"
-CHART_ACCENT = ["#c87941","#e8a85a","#f5d78e","#8b5e2a","#6b4010","#d4956a"]
+CHART_BG   = "#0f172a"
+CHART_TEXT = "#eef4ff"
+CHART_ACCENT = ["#3b82f6", "#60a5fa", "#38bdf8", "#1d4ed8", "#2563eb", "#818cf8"]
 PLT_PARAMS = dict(facecolor=CHART_BG, edgecolor="none")
 
 def monthly_revenue_chart(df):
@@ -358,7 +585,7 @@ def monthly_revenue_chart(df):
         paper_bgcolor=CHART_BG, plot_bgcolor=CHART_BG,
         font_color=CHART_TEXT,
         xaxis=dict(showgrid=False, color=CHART_TEXT),
-        yaxis=dict(showgrid=True, gridcolor="#3d2e1a", color=CHART_TEXT,
+        yaxis=dict(showgrid=True, gridcolor="#2f425c", color=CHART_TEXT,
                    tickprefix="₹", tickformat=",.0f"),
         legend=dict(bgcolor="rgba(0,0,0,0)", font_color=CHART_TEXT),
         margin=dict(l=10, r=10, t=10, b=10),
@@ -393,14 +620,14 @@ def top_products_chart(df, n=10):
         orientation="h",
         marker=dict(
             color=top["total_amount"],
-            colorscale=[[0,"#3d2200"],[0.5,"#c87941"],[1,"#f5d78e"]],
+            colorscale=[[0,"#1d4ed8"],[0.5,"#3b82f6"],[1,"#60a5fa"]],
             showscale=False
         )
     ))
     fig.update_layout(
         paper_bgcolor=CHART_BG, plot_bgcolor=CHART_BG,
         font_color=CHART_TEXT,
-        xaxis=dict(showgrid=True, gridcolor="#3d2e1a",
+        xaxis=dict(showgrid=True, gridcolor="#2f425c",
                    tickprefix="₹", tickformat=",.0f", color=CHART_TEXT),
         yaxis=dict(showgrid=False, color=CHART_TEXT),
         margin=dict(l=10, r=10, t=10, b=10),
@@ -417,7 +644,7 @@ def payment_mode_chart(df):
         paper_bgcolor=CHART_BG, plot_bgcolor=CHART_BG,
         font_color=CHART_TEXT, showlegend=False,
         xaxis=dict(showgrid=False, color=CHART_TEXT),
-        yaxis=dict(showgrid=True, gridcolor="#3d2e1a",
+        yaxis=dict(showgrid=True, gridcolor="#2f425c",
                    tickprefix="₹", tickformat=",.0f", color=CHART_TEXT),
         margin=dict(l=10, r=10, t=10, b=10),
         height=280
@@ -432,18 +659,80 @@ def project_chart(df):
               .head(8))
     fig = px.bar(proj, x="project", y="total_amount",
                  color="total_amount",
-                 color_continuous_scale=["#3d2200","#c87941","#f5d78e"])
+                 color_continuous_scale=["#1d4ed8","#3b82f6","#60a5fa"])
     fig.update_coloraxes(showscale=False)
     fig.update_layout(
         paper_bgcolor=CHART_BG, plot_bgcolor=CHART_BG,
         font_color=CHART_TEXT,
         xaxis=dict(showgrid=False, color=CHART_TEXT, tickangle=-30),
-        yaxis=dict(showgrid=True, gridcolor="#3d2e1a",
+        yaxis=dict(showgrid=True, gridcolor="#2f425c",
                    tickprefix="₹", tickformat=",.0f", color=CHART_TEXT),
         margin=dict(l=10, r=10, t=10, b=60),
         height=300
     )
     return fig
+
+def monthly_revenue_bokeh(df):
+    monthly = (df.groupby("month_order")["total_amount"]
+                 .sum()
+                 .reset_index()
+                 .sort_values("month_order"))
+    monthly["label"] = monthly["month_order"].dt.strftime("%b %Y")
+    source = ColumnDataSource(monthly)
+
+    p = figure(
+        x_range=monthly["label"].tolist(),
+        height=340,
+        sizing_mode="stretch_width",
+        toolbar_location="right",
+        tools="pan,wheel_zoom,box_zoom,reset,save",
+        title="Interactive Monthly Revenue (Bokeh)"
+    )
+    p.vbar(x="label", top="total_amount", width=0.65, source=source, color="#1f6feb", alpha=0.85, legend_label="Revenue")
+    p.line(x="label", y="total_amount", source=source, color="#0ea5a4", line_width=3, legend_label="Trend")
+    p.circle(x="label", y="total_amount", source=source, color="#0ea5a4", size=6)
+
+    hover = HoverTool(tooltips=[("Month", "@label"), ("Revenue", "₹@total_amount{0,0}")])
+    p.add_tools(hover)
+    p.yaxis[0].formatter = NumeralTickFormatter(format="₹0,0")
+    p.xaxis.major_label_orientation = 0.8
+    p.background_fill_color = "#0f172a"
+    p.border_fill_color = "#0f172a"
+    p.legend.location = "top_left"
+    p.grid.grid_line_color = "#223348"
+    p.axis.major_label_text_color = "#c9d8ee"
+    p.axis.axis_label_text_color = "#c9d8ee"
+    p.title.text_color = "#e8eef8"
+    return p
+
+def top_products_bokeh(df, n=10):
+    top = (df.groupby("product_name")["total_amount"]
+             .sum()
+             .nlargest(n)
+             .reset_index()
+             .sort_values("total_amount", ascending=False))
+    top["rank"] = [f"#{i+1}" for i in range(len(top))]
+    source = ColumnDataSource(top)
+
+    p = figure(
+        x_range=top["product_name"].tolist(),
+        height=370,
+        sizing_mode="stretch_width",
+        toolbar_location="right",
+        tools="pan,wheel_zoom,box_zoom,reset,save",
+        title="Top Products Revenue (Bokeh)"
+    )
+    p.vbar(x="product_name", top="total_amount", width=0.7, source=source, color="#0ea5a4", alpha=0.9)
+    p.add_tools(HoverTool(tooltips=[("Product", "@product_name"), ("Revenue", "₹@total_amount{0,0}")]))
+    p.yaxis[0].formatter = NumeralTickFormatter(format="₹0,0")
+    p.xaxis.major_label_orientation = 1.1
+    p.grid.grid_line_color = "#223348"
+    p.background_fill_color = "#0f172a"
+    p.border_fill_color = "#0f172a"
+    p.axis.major_label_text_color = "#c9d8ee"
+    p.axis.axis_label_text_color = "#c9d8ee"
+    p.title.text_color = "#e8eef8"
+    return p
 
 
 # ─────────────────────────────────────────────
@@ -463,7 +752,7 @@ with st.sidebar:
 
     page = st.radio(
         "Navigate",
-        ["📊  Dashboard", "➕  Add Sale", "📦  Products", "📁  All Sales", "⚙️  Settings"],
+        ["Dashboard", "Add Sale", "Products", "Sales", "Settings"],
         label_visibility="collapsed"
     )
 
@@ -477,9 +766,12 @@ with st.sidebar:
     )
     st.markdown("---")
     st.markdown("""
-    <div style="font-size:0.72rem; color:#6b5030; text-align:center;">
-      Built for your father's business 🙏<br>
-      Data saved locally on this machine
+    <div class="sidebar-profile">
+      <div class="profile-dot"></div>
+      <div style="overflow:hidden;">
+        <p class="profile-name">Aryan Jain</p>
+        <p class="profile-role">Business Admin</p>
+      </div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -530,10 +822,36 @@ if "Dashboard" in page:
     if df_filtered.empty:
         st.warning("No sales data for this period. Add some sales first!")
     else:
+        st.markdown('<div class="section-header">🎛️ Interactive Controls</div>', unsafe_allow_html=True)
+        cflt1, cflt2, cflt3 = st.columns([1.2, 1.2, 1.6])
+        with cflt1:
+            category_options = sorted(df_filtered["category"].dropna().unique().tolist())
+            dash_categories = st.multiselect("Category", options=category_options, default=category_options)
+        with cflt2:
+            pay_options = sorted(df_filtered["payment"].dropna().unique().tolist())
+            dash_payments = st.multiselect("Payment Mode", options=pay_options, default=pay_options)
+        with cflt3:
+            min_d = df_filtered["date"].min().date()
+            max_d = df_filtered["date"].max().date()
+            dash_date = st.date_input("Date Range", value=(min_d, max_d), min_value=min_d, max_value=max_d)
+
+        dash_df = df_filtered.copy()
+        if dash_categories:
+            dash_df = dash_df[dash_df["category"].isin(dash_categories)]
+        if dash_payments:
+            dash_df = dash_df[dash_df["payment"].isin(dash_payments)]
+        if isinstance(dash_date, tuple) and len(dash_date) == 2:
+            start_d, end_d = dash_date
+            dash_df = dash_df[(dash_df["date"] >= pd.Timestamp(start_d)) & (dash_df["date"] <= pd.Timestamp(end_d))]
+
+        if dash_df.empty:
+            st.info("No records match the current dashboard filters.")
+            st.stop()
+
         # ── KPI Metrics ──────────────────────────────
-        total_rev  = df_filtered["total_amount"].sum()
-        total_qty  = df_filtered["qty"].sum()
-        total_tx   = len(df_filtered)
+        total_rev  = dash_df["total_amount"].sum()
+        total_qty  = dash_df["qty"].sum()
+        total_tx   = len(dash_df)
         avg_order  = total_rev / total_tx if total_tx else 0
 
         k1, k2, k3, k4 = st.columns(4)
@@ -542,34 +860,41 @@ if "Dashboard" in page:
         k3.metric("🧾 Transactions",     f"{total_tx}")
         k4.metric("📈 Avg Order Value",  f"₹{avg_order:,.0f}")
 
-        st.markdown('<div class="section-header">📅 Monthly Revenue & Trend</div>',
+        st.markdown('<div class="section-header">📅 Monthly Revenue & Trend (Plotly)</div>',
                     unsafe_allow_html=True)
-        st.plotly_chart(monthly_revenue_chart(df_filtered), use_container_width=True)
+        st.plotly_chart(monthly_revenue_chart(dash_df), use_container_width=True)
 
         col1, col2 = st.columns(2)
         with col1:
             st.markdown('<div class="section-header">🏆 Top Products by Revenue</div>',
                         unsafe_allow_html=True)
-            st.plotly_chart(top_products_chart(df_filtered), use_container_width=True)
+            st.plotly_chart(top_products_chart(dash_df), use_container_width=True)
         with col2:
             st.markdown('<div class="section-header">🥧 Revenue by Category</div>',
                         unsafe_allow_html=True)
-            st.plotly_chart(category_pie_chart(df_filtered), use_container_width=True)
+            st.plotly_chart(category_pie_chart(dash_df), use_container_width=True)
+
+        st.markdown('<div class="section-header">⚡ Advanced Interactive View (Bokeh)</div>', unsafe_allow_html=True)
+        b1, b2 = st.columns(2)
+        with b1:
+            st.bokeh_chart(monthly_revenue_bokeh(dash_df), use_container_width=True)
+        with b2:
+            st.bokeh_chart(top_products_bokeh(dash_df), use_container_width=True)
 
         col3, col4 = st.columns(2)
         with col3:
             st.markdown('<div class="section-header">🏗️ Revenue by Project Type</div>',
                         unsafe_allow_html=True)
-            st.plotly_chart(project_chart(df_filtered), use_container_width=True)
+            st.plotly_chart(project_chart(dash_df), use_container_width=True)
         with col4:
             st.markdown('<div class="section-header">💳 Payment Mode Breakdown</div>',
                         unsafe_allow_html=True)
-            st.plotly_chart(payment_mode_chart(df_filtered), use_container_width=True)
+            st.plotly_chart(payment_mode_chart(dash_df), use_container_width=True)
 
         # ── Category table ───────────────────────────
         st.markdown('<div class="section-header">📊 Category Summary</div>',
                     unsafe_allow_html=True)
-        cat_summary = (df_filtered
+        cat_summary = (dash_df
                        .groupby("category")
                        .agg(Transactions=("sale_id","count"),
                             Units_Sold=("qty","sum"),
@@ -765,7 +1090,7 @@ elif "Products" in page:
 # ══════════════════════════════════════════════
 #  PAGE 4 — ALL SALES TABLE
 # ══════════════════════════════════════════════
-elif "All Sales" in page:
+elif "Sales" in page:
 
     st.markdown("""
     <div class="hero-banner">
@@ -829,24 +1154,27 @@ elif "Settings" in page:
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown('<div class="section-header">🏪 Business Info</div>', unsafe_allow_html=True)
-    biz_name  = st.text_input("Business Name", value="Sharma Plywood & Hardware")
-    biz_owner = st.text_input("Owner Name",    value="")
-    biz_city  = st.text_input("City",          value="Kota, Rajasthan")
-    biz_phone = st.text_input("Phone",         value="")
+    with st.container(border=True):
+        st.markdown('<div class="section-header">🏪 Business Info</div>', unsafe_allow_html=True)
+        biz_name  = st.text_input("Business Name", value="Sharma Plywood & Hardware")
+        biz_owner = st.text_input("Owner Name",    value="")
+        biz_city  = st.text_input("City",          value="Kota, Rajasthan")
+        biz_phone = st.text_input("Phone",         value="")
 
-    st.markdown('<div class="section-header">🗄️ Data Management</div>', unsafe_allow_html=True)
-    col_a, col_b = st.columns(2)
-    with col_a:
-        if st.button("🔄 Reload Sample Data", use_container_width=True):
-            st.session_state.sales = _gen_sample_sales()
-            save_sales(st.session_state.sales)
-            st.success("Sample data reloaded!")
-    with col_b:
-        if st.button("🔁 Reset Products to Default", use_container_width=True):
-            st.session_state.products = DEFAULT_PRODUCTS
-            save_products(DEFAULT_PRODUCTS)
-            st.success("Products reset to default catalog!")
+    with st.container(border=True):
+        st.markdown('<div class="section-header">🗄️ Data Management</div>', unsafe_allow_html=True)
+        col_a, col_b = st.columns(2)
+        with col_a:
+            if st.button("🔄 Reload Sample Data", use_container_width=True):
+                st.session_state.sales = _gen_sample_sales()
+                save_sales(st.session_state.sales)
+                st.success("Sample data reloaded!")
+        with col_b:
+            if st.button("🔁 Reset Products to Default", use_container_width=True):
+                st.session_state.products = DEFAULT_PRODUCTS
+                save_products(DEFAULT_PRODUCTS)
+                st.success("Products reset to default catalog!")
 
-    st.markdown('<div class="section-header">📊 Data Stats</div>', unsafe_allow_html=True)
-    st.info(f"📦 Total Products: **{len(products)}** | 🧾 Total Sales Records: **{len(sales)}**")
+    with st.container(border=True):
+        st.markdown('<div class="section-header">📊 Data Stats</div>', unsafe_allow_html=True)
+        st.info(f"📦 Total Products: **{len(products)}** | 🧾 Total Sales Records: **{len(sales)}**")
