@@ -1,0 +1,29 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Python / Streamlit (legacy)
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Next.js
+web/.next/
+web/out/
+web/tsconfig.tsbuildinfo
+
+# Node
+web/node_modules/
+
+# Env
+.env
+.env.local
+.env*.local
+
+# Editor
+.vscode/
+.idea/
+*.swp
