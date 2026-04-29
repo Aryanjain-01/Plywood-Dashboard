@@ -1,63 +1,121 @@
-# 🪵 Plywood Business Sales Intelligence Dashboard
+# PlywoodPro — Business Sales Dashboard
 
-## 🚀 Live Demo
-https://plywood-dashboard-8y5jqeighedbkghcgpwefj.streamlit.app
-
-A complete business management + analytics dashboard built for a plywood & wood products business.
+A full-stack business intelligence dashboard for a plywood & wood products business. Built with Next.js 14, TypeScript, Tailwind CSS, and Recharts.
 
 ## Features
-- 📊 Live KPIs: Revenue, Units Sold, Transaction count, Avg Order Value
-- 📅 Monthly Revenue Bar + Trend Line chart
-- 🏆 Top Products by Revenue (horizontal bar)
-- 🥧 Category Breakdown Donut chart
-- 🏗️ Project-wise Revenue chart
-- 💳 Payment Mode analysis
-- ➕ Add new sales (category → product → price → customer → project)
-- 📦 Product catalog with 25+ pre-loaded items (Plywood, Doors, Cen Mica, Veneer, Decoratives, Hardware)
-- ➕ Add new products with custom sizes and thickness
-- 📁 Full sales table with filters + CSV export
-- ⚙️ Settings and data management
 
-## Product Categories
-- **Plywood** — 4mm to 25mm, 8×4 ft sheets
-- **Doors** — Flush & Panel, Teak & Sal
-- **Cen Mica / Laminates** — Plain, Woodgrain, Matte, Sunmica
-- **Veneer** — Teak, Rosewood, Wenge, Maple
-- **Decoratives** — Moulding, Beading, Edge Band, PVC Foam
-- **Hardware** — Hinges, Dowels
+### Dashboard
+- KPI stat cards — Total Revenue, Units Sold, Transactions, Avg Order Value
+- 30-day trend indicators (↑/↓ % vs prior 30 days) on each stat card
+- Monthly revenue bar chart with average reference line
+- Category mix donut chart with percentage labels
+- Top 5 products by revenue with progress bars
+- Recent activity feed — click any entry to open its receipt
 
-## Setup & Run
+### Sales
+- Full sales table with sortable columns (Date, Product, Qty, Amount)
+- Search by product name, customer, project, or sale ID
+- Filter by category, payment method, and date range
+- Inline row editing — update qty, price, discount, customer, payment
+- Delete sale with confirmation
+- Receipt / print modal for any sale
+- Paginated view (15 rows per page) with footer totals
+- Export filtered results to CSV
+
+### Analytics
+- 12-week weekly revenue area chart
+- Payment method breakdown horizontal bar chart
+- Top customers table — order count, total revenue, avg order value
+- Revenue by category with percentage breakdown
+- Payment mix with percentage bars
+
+### Products
+- Product catalogue with search and category filter
+- Sortable by name or base price
+- Delete product with confirmation
+
+### Add Sale
+- Product dropdown with price and unit pre-filled
+- Live estimated total that updates with qty, price, and discount
+- Unit price auto-fills from selected product's base price
+- Date defaults to today
+
+### Settings
+- Add new products with ID, name, category, size, thickness, unit, base price
+- Business summary stats
+- Export all sales to CSV
+
+### General
+- Press `N` anywhere to open Add Sale
+- Success / error toast notifications
+- Persistent JSON storage — no database required
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 14 (App Router) |
+| Language | TypeScript (strict) |
+| Styling | Tailwind CSS v3 |
+| Charts | Recharts |
+| UI Primitives | Radix UI |
+| Icons | Lucide React |
+| Storage | JSON flat files (`data/`) |
+
+## Project Structure
+
+```
+Plywood-Dashboard/
+├── data/
+│   ├── sales.json          # all sales records
+│   └── products.json       # product catalogue
+└── web/
+    ├── app/
+    │   ├── api/
+    │   │   ├── sales/route.ts      # GET, POST, PUT, DELETE
+    │   │   └── products/route.ts   # GET, POST, PUT, DELETE
+    │   ├── globals.css
+    │   ├── layout.tsx
+    │   └── page.tsx                # main dashboard (all pages)
+    ├── components/
+    │   ├── dashboard/
+    │   │   ├── charts.tsx          # all Recharts components
+    │   │   └── sidebar.tsx
+    │   └── ui/                     # button, card, input, select, …
+    └── lib/
+        ├── data.ts                 # JSON read/write helpers
+        ├── format.ts               # formatINR, formatDate
+        ├── types.ts                # Sale, Product types
+        └── utils.ts                # cn()
+```
+
+## Getting Started
 
 ```bash
 # 1. Install dependencies
-pip install -r requirements.txt
+cd web
+npm install
 
-# 2. Run the dashboard
-streamlit run app.py
+# 2. Start the dev server
+npm run dev
 ```
 
-Your browser will open at http://localhost:8501
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Data Storage
-All data is saved locally in a `data/` folder as JSON files:
-- `data/sales.json` — all sales records
-- `data/products.json` — product catalog
 
-No internet or database required!
+All data is saved locally as JSON files — no database or internet connection required.
 
-## Interview Explanation Points
+- `data/sales.json` — sales records
+- `data/products.json` — product catalogue
 
-### Architecture
-1. **Data Layer**: JSON flat-file "database" — simple, portable, no SQL needed
-2. **Session State**: `st.session_state` acts as an in-memory cache, prevents reloading on every interaction
-3. **Data Cleaning**: `get_sales_df()` handles type casting, deduplication, null drops
-4. **Visualization**: Plotly for interactive charts (tooltips, zoom), Matplotlib-style theming via layout params
-5. **UI Routing**: Single `page` variable from sidebar radio controls which section renders
+## Product Categories
 
-### Key Pandas Operations
-- `groupby().agg()` — category/monthly summaries
-- `pd.to_datetime()` — date parsing
-- `pd.DateOffset()` — date filtering
-- `dt.to_period("M")` — monthly grouping
-- `nlargest()` — top N products
-- `rolling().mean()` — trend line
+| Category | Description |
+|---|---|
+| Plywood | 4mm–25mm sheets, 8×4 ft |
+| Doors | Flush & Panel, Teak & Sal |
+| Cen Mica | Plain, Woodgrain, Matte, Sunmica |
+| Veneer | Teak, Rosewood, Wenge, Maple |
+| Decoratives | Moulding, Beading, Edge Band, PVC Foam |
+| Hardware | Hinges, Dowels |
