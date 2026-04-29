@@ -9,6 +9,7 @@ export type Sale = {
   discount_pct: number
   total_amount: number
   customer: string
+  customer_type: string   // "Contractor" | "Retail" | "Builder" | "Dealer" | "Other"
   project: string
   payment: string
   note: string
@@ -22,4 +23,12 @@ export type Product = {
   thickness: string
   unit: string
   base_price: number
+  cost_price: number   // for margin calculation
+  stock: number        // current stock level
+  reorder_level: number // alert threshold
+}
+
+export type SalesTarget = {
+  month: string   // "YYYY-MM"
+  target: number
 }
