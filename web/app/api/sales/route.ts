@@ -14,3 +14,20 @@ export async function POST(req: Request) {
   await writeSales(sales)
   return NextResponse.json({ ok: true })
 }
+
+export async function PUT(req: Request) {
+  const body = (await req.json()) as Sale
+  const sales = await readSales()
+  const idx = sales.findIndex((s) => s.sale_id === body.sale_id)
+  if (idx === -1) return NextResponse.json({ error: "not found" }, { status: 404 })
+  sales[idx] = body
+  await writeSales(sales)
+  return NextResponse.json({ ok: true })
+}
+
+export async function DELETE(req: Request) {
+  const { sale_id } = (await req.json()) as { sale_id: string }
+  const sales = await readSales()
+  await writeSales(sales.filter((s) => s.sale_id !== sale_id))
+  return NextResponse.json({ ok: true })
+}
