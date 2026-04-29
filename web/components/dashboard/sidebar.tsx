@@ -1,22 +1,22 @@
 "use client"
 
 import type React from "react"
-import { LayoutDashboard, PlusCircle, Boxes, ReceiptText, Settings, LineChart } from "lucide-react"
+import { LayoutDashboard, PlusCircle, Boxes, ReceiptText, Settings, LineChart, AlertTriangle } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 type Page = "dashboard" | "add-sale" | "products" | "sales" | "analytics" | "settings"
 
 const items: { key: Page; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-  { key: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { key: "add-sale", label: "Add Sale", icon: PlusCircle },
-  { key: "products", label: "Products", icon: Boxes },
-  { key: "sales", label: "Sales", icon: ReceiptText },
-  { key: "analytics", label: "Analytics", icon: LineChart },
-  { key: "settings", label: "Settings", icon: Settings },
+  { key: "dashboard",  label: "Dashboard",  icon: LayoutDashboard },
+  { key: "add-sale",   label: "Add Sale",   icon: PlusCircle },
+  { key: "products",   label: "Products",   icon: Boxes },
+  { key: "sales",      label: "Sales",      icon: ReceiptText },
+  { key: "analytics",  label: "Analytics",  icon: LineChart },
+  { key: "settings",   label: "Settings",   icon: Settings },
 ]
 
-export function Sidebar({ page, setPage, salesCount }: {
-  page: Page; setPage: (p: Page) => void; salesCount?: number
+export function Sidebar({ page, setPage, salesCount, lowStockCount }: {
+  page: Page; setPage: (p: Page) => void; salesCount?: number; lowStockCount?: number
 }) {
   return (
     <aside className="fixed left-0 top-0 z-30 flex h-screen w-60 flex-col border-r border-white/[0.06] bg-[#0c1018]">
@@ -49,10 +49,19 @@ export function Sidebar({ page, setPage, salesCount }: {
               <Icon className={cn("h-4 w-4 shrink-0 transition-colors",
                 active ? "text-indigo-400" : "text-white/25 group-hover:text-white/50")} />
               <span className="flex-1 text-left">{item.label}</span>
+
               {item.key === "sales" && salesCount !== undefined && salesCount > 0 && (
                 <span className={cn("rounded-full px-1.5 py-0.5 text-[10px] font-semibold tabular-nums leading-none",
                   active ? "bg-indigo-400/20 text-indigo-300" : "bg-white/[0.07] text-white/30")}>
                   {salesCount > 999 ? "999+" : salesCount}
+                </span>
+              )}
+
+              {item.key === "products" && lowStockCount !== undefined && lowStockCount > 0 && (
+                <span className={cn("flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-semibold leading-none",
+                  active ? "bg-amber-400/20 text-amber-300" : "bg-amber-500/15 text-amber-400")}>
+                  <AlertTriangle className="h-2.5 w-2.5" />
+                  {lowStockCount}
                 </span>
               )}
             </button>
